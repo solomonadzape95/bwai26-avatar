@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/actionbar.tsx","./src/components/cropeditor.tsx","./src/components/dropzone.tsx","./src/components/previewcanvas.tsx","./src/components/stylepicker.tsx","./src/lib/composite.ts","./src/lib/crop.ts","./src/lib/styles.ts"],"version":"5.9.3"}
