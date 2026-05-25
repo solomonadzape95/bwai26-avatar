@@ -130,15 +130,8 @@ function SectionTitle({ step, title }: { step: string; title: string }) {
 
 function BrandMark() {
   return (
-    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200">
-      <svg viewBox="0 0 32 32" className="h-7 w-7" xmlns="http://www.w3.org/2000/svg">
-        <g fill="none" strokeWidth="5" strokeLinecap="round">
-          <line x1="13" y1="7" x2="6" y2="14.5" stroke="#EA4335" />
-          <line x1="13" y1="25" x2="6" y2="17.5" stroke="#4285F4" />
-          <line x1="19" y1="7" x2="26" y2="14.5" stroke="#34A853" />
-          <line x1="19" y1="25" x2="26" y2="17.5" stroke="#FBBC04" />
-        </g>
-      </svg>
+    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200">
+      <img src="/logo.png" alt="GDG" className="h-8 w-8 object-contain" />
     </div>
   );
 }

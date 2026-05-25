@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { composeAvatar, type Shape } from '../lib/composite';
 import type { PixelCrop } from '../lib/crop';
+import { isCloudinaryConfigured, uploadToCloudinary } from '../lib/upload';
 
 type Props = {
   sourceImage: HTMLImageElement | null;
@@ -9,7 +10,8 @@ type Props = {
   shape: Shape;
 };
 
-const SHARE_TEXT = 'My Build with AI 2026 avatar — generated at bwai26-avatar 🚀';
+const SHARE_TEXT = 'My Build with AI 2026 avatar 🚀';
+const SHARE_TITLE = 'Build with AI 2026 Avatar';
 
 function triggerDownload(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -22,9 +24,46 @@ function triggerDownload(blob: Blob, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function detectFileShareSupport(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  if (typeof navigator.share !== 'function') return false;
+  if (typeof navigator.canShare !== 'function') return false;
+  try {
+    const probe = new File([new Blob([new Uint8Array([0])])], 'probe.png', {
+      type: 'image/png',
+    });
+    return navigator.canShare({ files: [probe] });
+  } catch {
+    return false;
+  }
+}
+
+function writeLoadingScreen(win: Window) {
+  try {
+    win.document.title = 'Preparing share…';
+    win.document.body.style.cssText =
+      'margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,-apple-system,sans-serif;background:#fafafa;color:#1f1f1f;';
+    win.document.body.innerHTML = `
+      <div style="text-align:center">
+        <div style="font-size:14px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#4285F4">Build with AI 2026</div>
+        <div style="margin-top:8px;font-size:18px">Uploading your avatar…</div>
+        <div style="margin-top:24px"><span style="display:inline-block;width:32px;height:32px;border:3px solid #e5e7eb;border-top-color:#4285F4;border-radius:50%;animation:spin 1s linear infinite"></span></div>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+      </div>`;
+  } catch {
+    // cross-origin or closed; ignore
+  }
+}
+
 export function ActionBar({ sourceImage, cropPixels, styleUrl, shape }: Props) {
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [canFileShare, setCanFileShare] = useState(false);
+  const cloudinaryReady = isCloudinaryConfigured();
+
+  useEffect(() => {
+    setCanFileShare(detectFileShareSupport());
+  }, []);
 
   const disabled = !sourceImage || !cropPixels || busy;
   const canCopy =
@@ -40,7 +79,7 @@ export function ActionBar({ sourceImage, cropPixels, styleUrl, shape }: Props) {
 
   const showToast = (message: string) => {
     setToast(message);
-    setTimeout(() => setToast(null), 2200);
+    setTimeout(() => setToast(null), 2400);
   };
 
   const onDownload = async () => {
@@ -70,21 +109,73 @@ export function ActionBar({ sourceImage, cropPixels, styleUrl, shape }: Props) {
     }
   };
 
-  const onShare = async (target: 'x' | 'linkedin') => {
+  const onNativeShare = async () => {
+    if (!sourceImage || !cropPixels) return;
     setBusy(true);
     try {
       const blob = await generate();
-      if (blob) triggerDownload(blob, 'bwai26-avatar.png');
-      const text = encodeURIComponent(SHARE_TEXT);
-      const intent =
-        target === 'x'
-          ? `https://twitter.com/intent/tweet?text=${text}`
-          : `https://www.linkedin.com/feed/?shareActive=true&text=${text}`;
-      window.open(intent, '_blank', 'noopener,noreferrer');
-      showToast('Downloaded — attach the PNG in the new tab');
+      if (!blob) return;
+      const file = new File([blob], `bwai26-avatar-${shape}.png`, { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: SHARE_TITLE, text: SHARE_TEXT });
+          showToast('Shared!');
+        } catch (err) {
+          if ((err as Error).name === 'AbortError') return;
+          triggerDownload(blob, file.name);
+          showToast('Share failed — downloaded instead');
+        }
+      } else {
+        triggerDownload(blob, file.name);
+        showToast('Downloaded — attach to your post');
+      }
     } finally {
       setBusy(false);
     }
+  };
+
+  const onPostToSocial = (target: 'x' | 'linkedin') => {
+    if (!sourceImage || !cropPixels) return;
+    if (!cloudinaryReady) {
+      showToast('Set Cloudinary env vars first');
+      return;
+    }
+    const win = window.open('about:blank', '_blank');
+    if (!win) {
+      showToast('Popup blocked — allow popups and try again');
+      return;
+    }
+    writeLoadingScreen(win);
+
+    setBusy(true);
+    (async () => {
+      try {
+        const blob = await generate();
+        if (!blob) {
+          win.close();
+          return;
+        }
+        const { url: hostedUrl } = await uploadToCloudinary(blob);
+        const wrapper = new URL('/api/share', window.location.origin);
+        wrapper.searchParams.set('img', hostedUrl);
+        wrapper.searchParams.set('text', SHARE_TEXT);
+        const shareUrl = wrapper.toString();
+        const text = encodeURIComponent(SHARE_TEXT);
+        const encoded = encodeURIComponent(shareUrl);
+        const intent =
+          target === 'x'
+            ? `https://x.com/intent/post?text=${text}&url=${encoded}`
+            : `https://www.linkedin.com/sharing/share-offsite/?url=${encoded}`;
+        win.location.href = intent;
+        showToast('Uploaded — opening composer');
+      } catch (err) {
+        win.close();
+        const msg = err instanceof Error ? err.message : 'Upload failed';
+        showToast(msg.length > 80 ? 'Upload failed — try Download' : msg);
+      } finally {
+        setBusy(false);
+      }
+    })();
   };
 
   return (
@@ -109,29 +200,80 @@ export function ActionBar({ sourceImage, cropPixels, styleUrl, shape }: Props) {
           </button>
         )}
       </div>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => onShare('x')}
-          disabled={disabled}
-          className="flex-1 rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-bwai-ink transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Share on X
-        </button>
-        <button
-          type="button"
-          onClick={() => onShare('linkedin')}
-          disabled={disabled}
-          className="flex-1 rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-bwai-ink transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Share on LinkedIn
-        </button>
-      </div>
+
+      <button
+        type="button"
+        onClick={onNativeShare}
+        disabled={disabled}
+        className="flex items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-sm font-semibold text-bwai-ink transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <ShareIcon />
+        {canFileShare ? 'Share via device' : 'Share (downloads PNG)'}
+      </button>
+
+      {cloudinaryReady && (
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => onPostToSocial('x')}
+            disabled={disabled}
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <XIcon />
+            Post to X
+          </button>
+          <button
+            type="button"
+            onClick={() => onPostToSocial('linkedin')}
+            disabled={disabled}
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#0a66c2] px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <LinkedInIcon />
+            Post to LinkedIn
+          </button>
+        </div>
+      )}
+
+      {!cloudinaryReady && (
+        <p className="text-center text-[11px] text-neutral-400">
+          Set <code className="rounded bg-neutral-100 px-1">VITE_CLOUDINARY_CLOUD_NAME</code> and{' '}
+          <code className="rounded bg-neutral-100 px-1">VITE_CLOUDINARY_UPLOAD_PRESET</code> in
+          <code className="rounded bg-neutral-100 px-1"> .env.local</code> to enable direct X /
+          LinkedIn posting.
+        </p>
+      )}
+
       {toast && (
         <div className="rounded-xl bg-bwai-ink/90 px-3 py-2 text-center text-xs font-medium text-white">
           {toast}
         </div>
       )}
     </div>
+  );
+}
+
+function ShareIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+      <polyline points="16 6 12 2 8 6" />
+      <line x1="12" y1="2" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.852 3.37-1.852 3.601 0 4.267 2.37 4.267 5.455v6.288zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
   );
 }
