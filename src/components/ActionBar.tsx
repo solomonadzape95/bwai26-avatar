@@ -10,6 +10,14 @@ type Props = {
   shape: Shape;
 };
 
+type SocialTarget = 'x' | 'linkedin';
+
+type ReadyShare = {
+  target: SocialTarget;
+  intent: string;
+  hostedUrl: string;
+};
+
 const SHARE_TEXT = 'My Build with AI 2026 avatar 🚀';
 const SHARE_TITLE = 'Build with AI 2026 Avatar';
 
@@ -38,32 +46,33 @@ function detectFileShareSupport(): boolean {
   }
 }
 
-function writeLoadingScreen(win: Window) {
-  try {
-    win.document.title = 'Preparing share…';
-    win.document.body.style.cssText =
-      'margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,-apple-system,sans-serif;background:#fafafa;color:#1f1f1f;';
-    win.document.body.innerHTML = `
-      <div style="text-align:center">
-        <div style="font-size:14px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#4285F4">Build with AI 2026</div>
-        <div style="margin-top:8px;font-size:18px">Uploading your avatar…</div>
-        <div style="margin-top:24px"><span style="display:inline-block;width:32px;height:32px;border:3px solid #e5e7eb;border-top-color:#4285F4;border-radius:50%;animation:spin 1s linear infinite"></span></div>
-        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-      </div>`;
-  } catch {
-    // cross-origin or closed; ignore
-  }
+function buildIntent(target: SocialTarget, hostedUrl: string): string {
+  const wrapper = new URL('/api/share', window.location.origin);
+  wrapper.searchParams.set('img', hostedUrl);
+  wrapper.searchParams.set('text', SHARE_TEXT);
+  const shareUrl = wrapper.toString();
+  const text = encodeURIComponent(SHARE_TEXT);
+  const encoded = encodeURIComponent(shareUrl);
+  return target === 'x'
+    ? `https://x.com/intent/post?text=${text}&url=${encoded}`
+    : `https://www.linkedin.com/sharing/share-offsite/?url=${encoded}`;
 }
 
 export function ActionBar({ sourceImage, cropPixels, styleUrl, shape }: Props) {
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [canFileShare, setCanFileShare] = useState(false);
+  const [preparing, setPreparing] = useState<SocialTarget | null>(null);
+  const [ready, setReady] = useState<ReadyShare | null>(null);
   const cloudinaryReady = isCloudinaryConfigured();
 
   useEffect(() => {
     setCanFileShare(detectFileShareSupport());
   }, []);
+
+  useEffect(() => {
+    setReady(null);
+  }, [sourceImage, cropPixels, styleUrl, shape]);
 
   const disabled = !sourceImage || !cropPixels || busy;
   const canCopy =
@@ -134,48 +143,28 @@ export function ActionBar({ sourceImage, cropPixels, styleUrl, shape }: Props) {
     }
   };
 
-  const onPostToSocial = (target: 'x' | 'linkedin') => {
+  const prepareShare = async (target: SocialTarget) => {
     if (!sourceImage || !cropPixels) return;
     if (!cloudinaryReady) {
       showToast('Set Cloudinary env vars first');
       return;
     }
-    const win = window.open('about:blank', '_blank');
-    if (!win) {
-      showToast('Popup blocked — allow popups and try again');
-      return;
-    }
-    writeLoadingScreen(win);
-
     setBusy(true);
-    (async () => {
-      try {
-        const blob = await generate();
-        if (!blob) {
-          win.close();
-          return;
-        }
-        const { url: hostedUrl } = await uploadToCloudinary(blob);
-        const wrapper = new URL('/api/share', window.location.origin);
-        wrapper.searchParams.set('img', hostedUrl);
-        wrapper.searchParams.set('text', SHARE_TEXT);
-        const shareUrl = wrapper.toString();
-        const text = encodeURIComponent(SHARE_TEXT);
-        const encoded = encodeURIComponent(shareUrl);
-        const intent =
-          target === 'x'
-            ? `https://x.com/intent/post?text=${text}&url=${encoded}`
-            : `https://www.linkedin.com/sharing/share-offsite/?url=${encoded}`;
-        win.location.href = intent;
-        showToast('Uploaded — opening composer');
-      } catch (err) {
-        win.close();
-        const msg = err instanceof Error ? err.message : 'Upload failed';
-        showToast(msg.length > 80 ? 'Upload failed — try Download' : msg);
-      } finally {
-        setBusy(false);
-      }
-    })();
+    setPreparing(target);
+    setReady(null);
+    try {
+      const blob = await generate();
+      if (!blob) return;
+      const { url: hostedUrl } = await uploadToCloudinary(blob);
+      const intent = buildIntent(target, hostedUrl);
+      setReady({ target, intent, hostedUrl });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Upload failed';
+      showToast(msg.length > 80 ? 'Upload failed — try Download' : msg);
+    } finally {
+      setPreparing(null);
+      setBusy(false);
+    }
   };
 
   return (
@@ -187,7 +176,7 @@ export function ActionBar({ sourceImage, cropPixels, styleUrl, shape }: Props) {
           disabled={disabled}
           className="flex-1 rounded-full bg-bwai-blue px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:bg-neutral-300"
         >
-          {busy ? 'Working…' : 'Download PNG'}
+          {busy && !preparing ? 'Working…' : 'Download PNG'}
         </button>
         {canCopy && (
           <button
@@ -212,25 +201,40 @@ export function ActionBar({ sourceImage, cropPixels, styleUrl, shape }: Props) {
       </button>
 
       {cloudinaryReady && (
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => onPostToSocial('x')}
-            disabled={disabled}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <XIcon />
-            Post to X
-          </button>
-          <button
-            type="button"
-            onClick={() => onPostToSocial('linkedin')}
-            disabled={disabled}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#0a66c2] px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <LinkedInIcon />
-            Post to LinkedIn
-          </button>
+        <div className="flex flex-col gap-2">
+          {ready ? (
+            <ReadyShareCard
+              ready={ready}
+              onDismiss={() => setReady(null)}
+              onRedo={(target) => prepareShare(target)}
+              preparing={preparing}
+            />
+          ) : (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => prepareShare('x')}
+                disabled={disabled}
+                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <XIcon />
+                {preparing === 'x' ? 'Uploading…' : 'Post to X'}
+              </button>
+              <button
+                type="button"
+                onClick={() => prepareShare('linkedin')}
+                disabled={disabled}
+                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#0a66c2] px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <LinkedInIcon />
+                {preparing === 'linkedin' ? 'Uploading…' : 'Post to LinkedIn'}
+              </button>
+            </div>
+          )}
+          <p className="text-center text-[11px] text-neutral-400">
+            Click Post → upload → then click the link to open the composer. Two clicks avoid
+            popup blockers.
+          </p>
         </div>
       )}
 
@@ -249,6 +253,67 @@ export function ActionBar({ sourceImage, cropPixels, styleUrl, shape }: Props) {
         </div>
       )}
     </div>
+  );
+}
+
+function ReadyShareCard({
+  ready,
+  onDismiss,
+  onRedo,
+  preparing,
+}: {
+  ready: ReadyShare;
+  onDismiss: () => void;
+  onRedo: (target: SocialTarget) => void;
+  preparing: SocialTarget | null;
+}) {
+  const isX = ready.target === 'x';
+  const label = isX ? 'Open X composer' : 'Open LinkedIn composer';
+  const otherTarget: SocialTarget = isX ? 'linkedin' : 'x';
+  const otherLabel = otherTarget === 'x' ? 'Post to X instead' : 'Post to LinkedIn instead';
+  return (
+    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+      <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+        <CheckIcon /> Avatar uploaded · ready to share
+      </div>
+      <a
+        href={ready.intent}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onDismiss}
+        className={`flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-white transition ${
+          isX ? 'bg-black hover:bg-neutral-800' : 'bg-[#0a66c2] hover:brightness-110'
+        }`}
+      >
+        {isX ? <XIcon /> : <LinkedInIcon />}
+        {label} →
+      </a>
+      <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+        <button
+          type="button"
+          onClick={() => onRedo(otherTarget)}
+          disabled={preparing !== null}
+          className="font-medium text-neutral-600 underline-offset-2 hover:text-bwai-ink hover:underline disabled:opacity-50"
+        >
+          {preparing === otherTarget ? 'Uploading…' : otherLabel}
+        </button>
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="font-medium text-neutral-500 hover:text-bwai-ink"
+        >
+          Dismiss
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3,8 7,12 13,4" />
+    </svg>
   );
 }
 
