@@ -52,7 +52,9 @@ export default function App() {
             <div className="text-xs font-medium uppercase tracking-widest text-neutral-500">
               Build with AI · 2026
             </div>
-            <h1 className="text-xl font-semibold text-bwai-ink">Avatar Generator</h1>
+            <h1 className="text-xl font-semibold text-bwai-ink">
+              Avatar Generator
+            </h1>
           </div>
         </div>
       </header>
@@ -109,9 +111,37 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="mx-auto max-w-6xl px-6 pb-10 text-center text-xs text-neutral-400">
-        Made for the Build with AI 2026 community · client-side only · your photo never leaves
-        your browser
+      <footer
+        className="mx-auto max-w-6xl px-6 pb-10 text-center text-xs
+    text-neutral-400"
+      >
+        <p>
+          Built with the power of garri by{" "}
+          <a
+            href="https://x.com/0xsolenoid"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-bwai-ink underline-offset-2
+    hover:text-bwai-blue hover:underline"
+          >
+            solenoid
+          </a>{" "}
+          for{" "}
+          <a
+            href="https://gdg.community.dev/gdg-on-campus-university-of-niger
+    ia-nsukka-nigeria/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-bwai-ink underline-offset-2
+    hover:text-bwai-blue hover:underline"
+          >
+            GDGOCUNN
+          </a>
+        </p>
+        <p className='mt-2'>
+        Client-side only · Your
+        photo never leaves your browser
+        </p>
       </footer>
     </div>
   );
