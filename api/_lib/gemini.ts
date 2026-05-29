@@ -84,7 +84,24 @@ function buildRubric(): string {
 }
 
 export async function judgeSubmission(s: Submission): Promise<NonNullable<Submission['ai']>> {
-  const readme = await fetchReadme(s.githubUrl);
+  const hasGithub = Boolean(s.githubUrl && s.githubUrl.length > 0);
+  const hasAiStudio = Boolean(s.aiStudioUrl && s.aiStudioUrl.length > 0);
+  const readme = hasGithub ? await fetchReadme(s.githubUrl) : '';
+
+  const linkBlock = [
+    hasGithub ? `GitHub: ${s.githubUrl}` : null,
+    hasAiStudio ? `Google AI Studio: ${s.aiStudioUrl}` : null,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const aiStudioNote = hasAiStudio
+    ? `\nThis team shipped via a public Google AI Studio prompt rather than (or in addition to) a traditional codebase. Treat the AI Studio URL as both the demo and the build artifact: judge "Implementation Quality" by the prompt design, structure, and whether the system actually works in AI Studio. For "AI Integration", a meaningful AI Studio build (well-scoped system instructions, model + tool config, structured output, sane temperature) counts as deep AI integration. Do not penalize them for not having a GitHub repository or screenshots when the AI Studio link is provided.`
+    : '';
+
+  const readmeBlock = hasGithub
+    ? `\nREADME (may be truncated):\n${readme || '(README could not be fetched — judge with caution and lower presentation score if applicable.)'}\n`
+    : '';
 
   const promptText = `You are an experienced hackathon judge for "Build with AI 2026". Score the following submission across 6 metrics on an integer scale of 1–10. Be honest and discerning — most submissions should fall in the 4–7 range; reserve 9–10 for genuinely exceptional work and 1–2 for incoherent or non-functional entries.
 
@@ -93,14 +110,12 @@ ${buildRubric()}
 
 Submission:
 Project name: ${s.projectName}
-GitHub: ${s.githubUrl}
+${linkBlock}
 Submitter: ${s.submitter.name}
 
 Overview:
 ${s.overview}
-
-README (may be truncated):
-${readme || '(README could not be fetched — judge with caution and lower presentation score if applicable.)'}
+${readmeBlock}${aiStudioNote}
 
 Then look at the attached screenshots to verify the implementation claims and judge design quality.
 

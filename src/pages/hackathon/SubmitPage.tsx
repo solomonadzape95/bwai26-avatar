@@ -14,6 +14,7 @@ import {
 const MAX_SCREENSHOTS = 5;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const GITHUB_RE = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/?$/;
+const AISTUDIO_RE = /^https:\/\/aistudio\.google\.com\/[^\s]+$/;
 
 export default function SubmitPage() {
   const { state } = useTimerState();
@@ -126,6 +127,7 @@ function AlreadySubmittedCard({
 function SubmitForm({ onSubmitted }: { onSubmitted: (s: StoredSubmission) => void }) {
   const [projectName, setProjectName] = useState('');
   const [githubUrl, setGithubUrl] = useState('');
+  const [aiStudioUrl, setAiStudioUrl] = useState('');
   const [overview, setOverview] = useState('');
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [submitterName, setSubmitterName] = useState('');
@@ -138,14 +140,22 @@ function SubmitForm({ onSubmitted }: { onSubmitted: (s: StoredSubmission) => voi
   const trimmed = {
     projectName: projectName.trim(),
     githubUrl: githubUrl.trim(),
+    aiStudioUrl: aiStudioUrl.trim(),
     overview: overview.trim(),
     submitterName: submitterName.trim(),
     submitterEmail: submitterEmail.trim(),
   };
 
+  const githubValid =
+    trimmed.githubUrl.length === 0 || GITHUB_RE.test(trimmed.githubUrl);
+  const aiStudioValid =
+    trimmed.aiStudioUrl.length === 0 || AISTUDIO_RE.test(trimmed.aiStudioUrl);
+  const hasAtLeastOneLink =
+    GITHUB_RE.test(trimmed.githubUrl) || AISTUDIO_RE.test(trimmed.aiStudioUrl);
+
   const checks = {
     project: trimmed.projectName.length >= 3 && trimmed.projectName.length <= 80,
-    github: GITHUB_RE.test(trimmed.githubUrl),
+    link: hasAtLeastOneLink && githubValid && aiStudioValid,
     overview: trimmed.overview.length >= 100 && trimmed.overview.length <= 2000,
     screenshots: screenshots.length >= 1 && screenshots.length <= MAX_SCREENSHOTS,
     name: trimmed.submitterName.length >= 2 && trimmed.submitterName.length <= 80,
@@ -163,8 +173,14 @@ function SubmitForm({ onSubmitted }: { onSubmitted: (s: StoredSubmission) => voi
     githubUrl:
       githubUrl.length === 0
         ? null
-        : !checks.github
+        : !githubValid
         ? 'Must look like https://github.com/<owner>/<repo>'
+        : null,
+    aiStudioUrl:
+      aiStudioUrl.length === 0
+        ? null
+        : !aiStudioValid
+        ? 'Must start with https://aistudio.google.com/'
         : null,
     overview:
       overview.length === 0 ? null : !checks.overview ? '100–2000 characters' : null,
@@ -213,6 +229,7 @@ function SubmitForm({ onSubmitted }: { onSubmitted: (s: StoredSubmission) => voi
       const { id } = await api.submit({
         projectName: trimmed.projectName,
         githubUrl: trimmed.githubUrl,
+        aiStudioUrl: trimmed.aiStudioUrl,
         overview: trimmed.overview,
         screenshotUrls: screenshots,
         submitter: { name: trimmed.submitterName, email: trimmed.submitterEmail },
@@ -260,6 +277,11 @@ function SubmitForm({ onSubmitted }: { onSubmitted: (s: StoredSubmission) => voi
           />
         </Field>
 
+        <div className="rounded-2xl bg-bwai-blue/5 p-4 text-xs text-bwai-ink dark:bg-bwai-blue/10 dark:text-neutral-200 sm:text-sm">
+          You need <span className="font-semibold">at least one</span> of the two links below. A
+          public AI Studio link counts as the demo + the codebase if you built entirely there.
+        </div>
+
         <Field
           label="GitHub repository"
           hint="Public repo with a clear README"
@@ -270,6 +292,19 @@ function SubmitForm({ onSubmitted }: { onSubmitted: (s: StoredSubmission) => voi
             onChange={(e) => setGithubUrl(e.target.value)}
             className="form-input"
             placeholder="https://github.com/your-team/your-repo"
+          />
+        </Field>
+
+        <Field
+          label="Google AI Studio link"
+          hint="Public share URL — replaces the demo + repo if used alone"
+          error={errors.aiStudioUrl}
+        >
+          <input
+            value={aiStudioUrl}
+            onChange={(e) => setAiStudioUrl(e.target.value)}
+            className="form-input"
+            placeholder="https://aistudio.google.com/app/prompts/..."
           />
         </Field>
 
@@ -383,7 +418,7 @@ function SubmitForm({ onSubmitted }: { onSubmitted: (s: StoredSubmission) => voi
           </h3>
           <ul className="mt-3 space-y-2 text-sm">
             <Check label="Project name" done={checks.project} />
-            <Check label="GitHub repository" done={checks.github} />
+            <Check label="GitHub repo or AI Studio link" done={checks.link} />
             <Check label="Overview (100+ chars)" done={checks.overview} />
             <Check label="At least 1 screenshot" done={checks.screenshots} />
             <Check label="Submitter name" done={checks.name} />

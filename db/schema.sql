@@ -51,6 +51,8 @@ alter table human_scores add column if not exists weighted_total numeric;
 create index if not exists human_scores_weighted_total_idx
   on human_scores (weighted_total desc);
 
+alter table submissions add column if not exists ai_studio_url text;
+
 -- Lock down tables: RLS on, no policies => only service_role can access.
 alter table submissions  enable row level security;
 alter table ai_scores    enable row level security;

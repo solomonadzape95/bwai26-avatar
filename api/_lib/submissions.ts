@@ -11,6 +11,7 @@ type SubmissionRow = {
   id: string;
   project_name: string;
   github_url: string;
+  ai_studio_url: string | null;
   overview: string;
   screenshot_urls: string[] | null;
   submitter_name: string;
@@ -37,6 +38,7 @@ type HumanRow = {
 type CreateInput = {
   projectName: string;
   githubUrl: string;
+  aiStudioUrl: string;
   overview: string;
   screenshotUrls: string[];
   submitter: { name: string; email: string };
@@ -47,6 +49,7 @@ function build(s: SubmissionRow, ai?: AiRow, human?: HumanRow): Submission {
     id: s.id,
     projectName: s.project_name,
     githubUrl: s.github_url,
+    aiStudioUrl: s.ai_studio_url ?? undefined,
     overview: s.overview,
     screenshotUrls: s.screenshot_urls ?? [],
     submitter: { name: s.submitter_name, email: s.submitter_email },
@@ -88,6 +91,7 @@ export async function createSubmission(input: CreateInput): Promise<string> {
     .insert({
       project_name: input.projectName,
       github_url: input.githubUrl,
+      ai_studio_url: input.aiStudioUrl || null,
       overview: input.overview,
       screenshot_urls: input.screenshotUrls,
       submitter_name: input.submitter.name,

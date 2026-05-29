@@ -37,6 +37,7 @@ async function request<T>(path: string, init: RequestInit & { admin?: boolean } 
 export type CreateSubmissionInput = {
   projectName: string;
   githubUrl: string;
+  aiStudioUrl: string;
   overview: string;
   screenshotUrls: string[];
   submitter: { name: string; email: string };

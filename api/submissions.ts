@@ -4,6 +4,7 @@ import { createSubmission, listSubmissions, summarize } from './_lib/submissions
 import { isTimerRunning } from './_lib/timer.js';
 
 const GITHUB_RE = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/?$/;
+const AISTUDIO_RE = /^https:\/\/aistudio\.google\.com\/[^\s]+$/;
 
 function isSupabaseScreenshotUrl(url: string): boolean {
   const base = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
@@ -14,21 +15,42 @@ function isSupabaseScreenshotUrl(url: string): boolean {
 type CreateBody = {
   projectName?: unknown;
   githubUrl?: unknown;
+  aiStudioUrl?: unknown;
   overview?: unknown;
   screenshotUrls?: unknown;
   submitter?: { name?: unknown; email?: unknown };
 };
 
 function validate(body: CreateBody):
-  | { ok: true; data: { projectName: string; githubUrl: string; overview: string; screenshotUrls: string[]; submitter: { name: string; email: string } } }
+  | {
+      ok: true;
+      data: {
+        projectName: string;
+        githubUrl: string;
+        aiStudioUrl: string;
+        overview: string;
+        screenshotUrls: string[];
+        submitter: { name: string; email: string };
+      };
+    }
   | { ok: false; error: string } {
   const projectName = typeof body.projectName === 'string' ? body.projectName.trim() : '';
   if (projectName.length < 3 || projectName.length > 80) {
     return { ok: false, error: 'projectName must be 3–80 characters' };
   }
   const githubUrl = typeof body.githubUrl === 'string' ? body.githubUrl.trim() : '';
-  if (!GITHUB_RE.test(githubUrl)) {
+  const aiStudioUrl = typeof body.aiStudioUrl === 'string' ? body.aiStudioUrl.trim() : '';
+  if (githubUrl.length > 0 && !GITHUB_RE.test(githubUrl)) {
     return { ok: false, error: 'githubUrl must look like https://github.com/<owner>/<repo>' };
+  }
+  if (aiStudioUrl.length > 0 && !AISTUDIO_RE.test(aiStudioUrl)) {
+    return { ok: false, error: 'aiStudioUrl must start with https://aistudio.google.com/' };
+  }
+  if (githubUrl.length === 0 && aiStudioUrl.length === 0) {
+    return {
+      ok: false,
+      error: 'Provide a GitHub repository URL, a Google AI Studio link, or both.',
+    };
   }
   const overview = typeof body.overview === 'string' ? body.overview.trim() : '';
   if (overview.length < 100 || overview.length > 2000) {
@@ -52,7 +74,14 @@ function validate(body: CreateBody):
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: 'submitter.email invalid' };
   return {
     ok: true,
-    data: { projectName, githubUrl, overview, screenshotUrls, submitter: { name, email } },
+    data: {
+      projectName,
+      githubUrl,
+      aiStudioUrl,
+      overview,
+      screenshotUrls,
+      submitter: { name, email },
+    },
   };
 }
 

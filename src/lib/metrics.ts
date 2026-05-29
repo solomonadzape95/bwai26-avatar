@@ -67,13 +67,14 @@ export function weightedTotal(scores: Record<MetricKey, { score: number }>): num
 }
 
 export type Submission = {
-  id: string;                    // sheet row number (1-based, excluding header)
+  id: string;
   projectName: string;
-  githubUrl: string;
+  githubUrl: string;             // empty string if AI Studio link was used instead
+  aiStudioUrl?: string;          // optional public Google AI Studio link
   overview: string;
-  screenshotUrls: string[];      // Google Drive URLs from the form
+  screenshotUrls: string[];
   submitter: { name: string; email: string };
-  submittedAt: string;           // ISO from Form timestamp
+  submittedAt: string;
   ai?: {
     scores: AiScores;
     weightedTotal: number;

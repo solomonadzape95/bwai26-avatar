@@ -128,16 +128,28 @@ function SubmissionView() {
           </a>{' '}
           · submitted {new Date(submission.submittedAt).toLocaleString()}
         </p>
-        <p>
-          <a
-            href={submission.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-semibold text-bwai-blue underline-offset-2 hover:underline"
-          >
-            {submission.githubUrl} ↗
-          </a>
-        </p>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+          {submission.githubUrl && (
+            <a
+              href={submission.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-bwai-blue underline-offset-2 hover:underline"
+            >
+              {submission.githubUrl} ↗
+            </a>
+          )}
+          {submission.aiStudioUrl && (
+            <a
+              href={submission.aiStudioUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-bwai-green underline-offset-2 hover:underline"
+            >
+              AI Studio ↗
+            </a>
+          )}
+        </div>
         <p className="whitespace-pre-line text-sm text-neutral-700">{submission.overview}</p>
         {submission.screenshotUrls.length > 0 && (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
