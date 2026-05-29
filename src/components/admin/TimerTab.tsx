@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../../lib/api';
 import BigCountdown from '../BigCountdown';
 import { endsAtDate, phaseOf, useTimerState } from '../../lib/timerState';
@@ -6,14 +6,22 @@ import { endsAtDate, phaseOf, useTimerState } from '../../lib/timerState';
 function formatDuration(seconds: number): string {
   if (seconds >= 3600) {
     const h = Math.floor(seconds / 3600);
-    return `${h} hour${h === 1 ? '' : 's'}`;
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    const parts = [`${h}h`];
+    if (m) parts.push(`${m}m`);
+    if (s) parts.push(`${s}s`);
+    return parts.join(' ');
   }
   if (seconds >= 60) {
     const m = Math.floor(seconds / 60);
-    return `${m} minute${m === 1 ? '' : 's'}`;
+    const s = seconds % 60;
+    return s ? `${m}m ${s}s` : `${m}m`;
   }
-  return `${seconds} second${seconds === 1 ? '' : 's'}`;
+  return `${seconds}s`;
 }
+
+const PRESETS = [10, 30, 120, 1800, 2700, 3600, 5400];
 
 export default function TimerTab() {
   const { state, refresh, error } = useTimerState(5_000);
@@ -21,15 +29,24 @@ export default function TimerTab() {
   const endsAt = endsAtDate(state);
   const durationSeconds = state?.durationSeconds ?? 0;
 
-  const [busy, setBusy] = useState<'start' | 'stop' | null>(null);
+  const [draftSeconds, setDraftSeconds] = useState<number>(durationSeconds);
+  const [busy, setBusy] = useState<'start' | 'stop' | 'save' | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (durationSeconds > 0 && draftSeconds === 0) setDraftSeconds(durationSeconds);
+  }, [durationSeconds, draftSeconds]);
+
+  const draftValid = Number.isInteger(draftSeconds) && draftSeconds >= 1 && draftSeconds <= 86_400;
+  const draftDiffers = draftSeconds !== durationSeconds;
+
   async function start() {
+    if (!draftValid) return;
     if (phase === 'running' && !confirm('Restart the timer? This resets the countdown.')) return;
     setBusy('start');
     setActionError(null);
     try {
-      await api.timerStart();
+      await api.timerStart(draftSeconds);
       await refresh();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'failed');
@@ -44,6 +61,20 @@ export default function TimerTab() {
     setActionError(null);
     try {
       await api.timerStop();
+      await refresh();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'failed');
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function saveDuration() {
+    if (!draftValid) return;
+    setBusy('save');
+    setActionError(null);
+    try {
+      await api.timerSetDuration(draftSeconds);
       await refresh();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'failed');
@@ -98,19 +129,54 @@ export default function TimerTab() {
 
       <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-900 dark:ring-neutral-800">
         <h3 className="text-lg font-semibold text-bwai-ink dark:text-neutral-100">
-          {phase === 'running' ? 'Restart the countdown' : 'Start the countdown'}
+          Duration
         </h3>
         <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-          Duration is set by{' '}
-          <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-bwai-ink dark:bg-neutral-800 dark:text-neutral-100">
-            HACKATHON_DURATION_SECONDS
-          </code>{' '}
-          (currently{' '}
-          <span className="font-semibold text-bwai-ink dark:text-neutral-100">
-            {state ? formatDuration(state.durationSeconds) : '—'}
-          </span>
-          ). Change the env var and redeploy to use a different duration.
+          Saved in the database — any positive value up to 24 hours (86 400 s). Starting the
+          timer with a different value also saves it.
         </p>
+
+        <div className="mt-4 flex flex-wrap items-end gap-3">
+          <label className="block">
+            <span className="text-xs font-semibold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
+              Seconds
+            </span>
+            <input
+              type="number"
+              min={1}
+              max={86_400}
+              value={Number.isFinite(draftSeconds) ? draftSeconds : ''}
+              onChange={(e) => {
+                const next = Number(e.target.value);
+                setDraftSeconds(Number.isFinite(next) ? Math.round(next) : 0);
+              }}
+              className="form-input mt-1 w-40"
+            />
+          </label>
+          <span className="pb-2 text-sm text-neutral-500 dark:text-neutral-400">
+            ={' '}
+            <span className="font-semibold text-bwai-ink dark:text-neutral-100">
+              {draftValid ? formatDuration(draftSeconds) : '—'}
+            </span>
+          </span>
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {PRESETS.map((sec) => (
+            <button
+              key={sec}
+              type="button"
+              onClick={() => setDraftSeconds(sec)}
+              className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ring-1 ring-neutral-200 transition-colors dark:ring-neutral-800 ${
+                draftSeconds === sec
+                  ? 'bg-bwai-ink text-white dark:bg-white dark:text-bwai-ink'
+                  : 'bg-white text-bwai-ink hover:ring-bwai-blue dark:bg-neutral-950 dark:text-neutral-100'
+              }`}
+            >
+              {formatDuration(sec)}
+            </button>
+          ))}
+        </div>
 
         {actionError && (
           <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-bwai-red dark:bg-red-950/40">
@@ -126,15 +192,24 @@ export default function TimerTab() {
         <div className="mt-5 flex flex-wrap gap-3">
           <button
             onClick={start}
-            disabled={busy !== null || phase === 'loading'}
+            disabled={busy !== null || phase === 'loading' || !draftValid}
             className="rounded-full bg-bwai-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-bwai-blue disabled:opacity-50 dark:bg-white dark:text-bwai-ink dark:hover:bg-bwai-blue dark:hover:text-white"
           >
             {busy === 'start'
               ? 'Starting…'
               : phase === 'running'
-              ? 'Restart timer'
+              ? 'Restart with this duration'
               : 'Start timer'}
           </button>
+          {draftDiffers && phase !== 'running' && (
+            <button
+              onClick={saveDuration}
+              disabled={busy !== null || !draftValid}
+              className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-bwai-ink ring-1 ring-neutral-200 hover:ring-bwai-blue disabled:opacity-50 dark:bg-neutral-950 dark:text-neutral-100 dark:ring-neutral-800"
+            >
+              {busy === 'save' ? 'Saving…' : 'Save duration only'}
+            </button>
+          )}
           {(phase === 'running' || phase === 'ended') && (
             <button
               onClick={stop}

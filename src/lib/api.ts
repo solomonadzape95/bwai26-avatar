@@ -71,17 +71,27 @@ export const api = {
       admin: true,
       body: JSON.stringify(payload),
     }),
-  timerStart: () =>
+  timerStart: (durationSeconds?: number) =>
     request<TimerState>('/api/admin/timer', {
       method: 'POST',
       admin: true,
-      body: JSON.stringify({ action: 'start' }),
+      body: JSON.stringify(
+        durationSeconds !== undefined
+          ? { action: 'start', durationSeconds }
+          : { action: 'start' },
+      ),
     }),
   timerStop: () =>
     request<TimerState>('/api/admin/timer', {
       method: 'POST',
       admin: true,
       body: JSON.stringify({ action: 'stop' }),
+    }),
+  timerSetDuration: (durationSeconds: number) =>
+    request<TimerState>('/api/admin/timer', {
+      method: 'POST',
+      admin: true,
+      body: JSON.stringify({ action: 'set-duration', durationSeconds }),
     }),
   results: () =>
     request<{

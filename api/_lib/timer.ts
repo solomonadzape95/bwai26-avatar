@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { getDurationSeconds } from './duration.js';
+import { DEFAULT_DURATION_SECONDS, validateDurationSeconds } from './duration.js';
 
 export type TimerState = {
   startedAt: number | null;
@@ -10,26 +10,30 @@ const TABLE = 'timer_state';
 const ROW_ID = 1;
 
 export async function getTimerState(): Promise<TimerState> {
-  const durationSeconds = getDurationSeconds();
   const { data, error } = await supabase()
     .from(TABLE)
-    .select('started_at')
+    .select('started_at, duration_seconds')
     .eq('id', ROW_ID)
     .single();
   if (error) throw new Error(`timer_state read failed: ${error.message}`);
   const raw = data?.started_at ?? null;
   const startedAt = raw ? new Date(raw).getTime() : null;
+  const durationSeconds =
+    typeof data?.duration_seconds === 'number' && data.duration_seconds > 0
+      ? data.duration_seconds
+      : DEFAULT_DURATION_SECONDS;
   return { startedAt, durationSeconds };
 }
 
-export async function startTimer(): Promise<TimerState> {
+export async function startTimer(durationSeconds?: number): Promise<TimerState> {
   const now = new Date();
-  const { error } = await supabase()
-    .from(TABLE)
-    .update({ started_at: now.toISOString() })
-    .eq('id', ROW_ID);
+  const patch: Record<string, unknown> = { started_at: now.toISOString() };
+  if (durationSeconds !== undefined) {
+    patch.duration_seconds = validateDurationSeconds(durationSeconds);
+  }
+  const { error } = await supabase().from(TABLE).update(patch).eq('id', ROW_ID);
   if (error) throw new Error(`timer_state start failed: ${error.message}`);
-  return { startedAt: now.getTime(), durationSeconds: getDurationSeconds() };
+  return getTimerState();
 }
 
 export async function stopTimer(): Promise<TimerState> {
@@ -38,7 +42,17 @@ export async function stopTimer(): Promise<TimerState> {
     .update({ started_at: null })
     .eq('id', ROW_ID);
   if (error) throw new Error(`timer_state stop failed: ${error.message}`);
-  return { startedAt: null, durationSeconds: getDurationSeconds() };
+  return getTimerState();
+}
+
+export async function setDuration(durationSeconds: number): Promise<TimerState> {
+  const valid = validateDurationSeconds(durationSeconds);
+  const { error } = await supabase()
+    .from(TABLE)
+    .update({ duration_seconds: valid })
+    .eq('id', ROW_ID);
+  if (error) throw new Error(`timer_state duration write failed: ${error.message}`);
+  return getTimerState();
 }
 
 export async function isTimerRunning(now: number = Date.now()): Promise<boolean> {

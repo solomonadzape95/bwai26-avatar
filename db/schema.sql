@@ -53,6 +53,9 @@ create index if not exists human_scores_weighted_total_idx
 
 alter table submissions add column if not exists ai_studio_url text;
 
+alter table timer_state
+  add column if not exists duration_seconds integer not null default 2700;
+
 -- Lock down tables: RLS on, no policies => only service_role can access.
 alter table submissions  enable row level security;
 alter table ai_scores    enable row level security;
