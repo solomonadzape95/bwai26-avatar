@@ -5,7 +5,7 @@ export type RuleTile = {
 };
 
 export const RULES_INTRO =
-  'One Hour. Build something useful with AI. Ship code. Read the rules before you start.';
+  '45 minutes. Build something useful with AI. Ship code. Read the rules before you start.';
 
 export const RULES_TILES: RuleTile[] = [
   {

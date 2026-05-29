@@ -34,7 +34,7 @@ export default function HackathonHub() {
           Build with AI 2026
         </h2>
         <p className="mt-6 max-w-3xl text-lg text-white/90 sm:text-2xl">
-          One hour. One team. Build something with AI, ship it, pitch it. Everything you need is
+          45 minutes. One team. Build something with AI, ship it, pitch it. Everything you need is
           in the four pages below.
         </p>
       </section>
