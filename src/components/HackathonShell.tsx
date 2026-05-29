@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
+import { readJson, writeJson } from '../lib/localCache';
 
 const BASE_LINKS = [
   { to: '/hackathon/rules', label: 'Rules' },
@@ -9,8 +10,13 @@ const BASE_LINKS = [
   { to: '/hackathon/submit', label: 'Submit' },
 ];
 
+const RESULTS_CACHE_KEY = 'bwai26.results';
+
+type CachedResults = { published: boolean };
+
 export default function HackathonShell() {
-  const [resultsLive, setResultsLive] = useState(false);
+  const cached = readJson<CachedResults>(RESULTS_CACHE_KEY);
+  const [resultsLive, setResultsLive] = useState(Boolean(cached?.published));
 
   useEffect(() => {
     let cancelled = false;
@@ -18,8 +24,15 @@ export default function HackathonShell() {
       try {
         const res = await fetch('/api/results');
         if (!res.ok) return;
-        const json = (await res.json()) as { published?: boolean };
-        if (!cancelled) setResultsLive(Boolean(json.published));
+        const json = (await res.json()) as { published?: boolean; top?: unknown };
+        if (cancelled) return;
+        const live = Boolean(json.published);
+        setResultsLive(live);
+        const prev = readJson<{ published: boolean; top: unknown }>(RESULTS_CACHE_KEY);
+        writeJson(RESULTS_CACHE_KEY, {
+          published: live,
+          top: (json.top ?? prev?.top ?? []) as unknown,
+        });
       } catch {
         // ignore
       }

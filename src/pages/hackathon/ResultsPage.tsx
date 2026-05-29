@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { api } from '../../lib/api';
+import { readJson, writeJson } from '../../lib/localCache';
 
 type ResultRow = {
   rank: number;
@@ -25,9 +26,14 @@ const ORDINALS: Record<number, string> = {
   5: '5th',
 };
 
+const CACHE_KEY = 'bwai26.results';
+
+type CachedResults = { published: boolean; top: ResultRow[] };
+
 export default function ResultsPage() {
-  const [published, setPublished] = useState<boolean | null>(null);
-  const [top, setTop] = useState<ResultRow[]>([]);
+  const cached = readJson<CachedResults>(CACHE_KEY);
+  const [published, setPublished] = useState<boolean | null>(cached?.published ?? null);
+  const [top, setTop] = useState<ResultRow[]>(cached?.top ?? []);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,6 +44,7 @@ export default function ResultsPage() {
         if (cancelled) return;
         setPublished(r.published);
         setTop(r.top);
+        writeJson(CACHE_KEY, { published: r.published, top: r.top });
       } catch (err) {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : 'failed to load');

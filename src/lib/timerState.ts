@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { readJson, writeJson } from './localCache';
 
 export type TimerState = {
   startedAt: number | null;
@@ -8,6 +9,7 @@ export type TimerState = {
 export type TimerPhase = 'loading' | 'not-started' | 'running' | 'ended';
 
 const EMPTY: TimerState = { startedAt: null, durationSeconds: 0 };
+const CACHE_KEY = 'bwai26.timerState';
 
 export function endsAtMs(state: TimerState | null): number | null {
   if (!state || state.startedAt === null) return null;
@@ -27,7 +29,9 @@ export function endsAtDate(state: TimerState | null): Date | null {
 }
 
 export function useTimerState(pollMs = 30_000) {
-  const [state, setState] = useState<TimerState | null>(null);
+  const [state, setState] = useState<TimerState | null>(() =>
+    readJson<TimerState>(CACHE_KEY),
+  );
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
@@ -35,7 +39,9 @@ export function useTimerState(pollMs = 30_000) {
       const res = await fetch('/api/timer', { cache: 'no-store' });
       if (!res.ok) throw new Error(`status ${res.status}`);
       const json = (await res.json()) as TimerState;
-      setState(json ?? EMPTY);
+      const next = json ?? EMPTY;
+      setState(next);
+      writeJson(CACHE_KEY, next);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'failed to load');

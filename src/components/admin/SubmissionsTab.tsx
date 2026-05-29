@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../lib/api';
+import { readJson, writeJson } from '../../lib/localCache';
 import type { SubmissionSummary } from '../../lib/metrics';
+
+const CACHE_KEY = 'bwai26.adminSubmissions';
+const FINALISTS_KEY = 'bwai26.adminFinalists';
 
 const CONCURRENCY = 3;
 
@@ -18,8 +22,12 @@ type Progress = {
 const INITIAL: Progress = { active: false, total: 0, done: 0, inFlight: 0, failures: [] };
 
 export default function SubmissionsTab() {
-  const [submissions, setSubmissions] = useState<SubmissionSummary[] | null>(null);
-  const [finalists, setFinalists] = useState<SubmissionSummary[] | null>(null);
+  const [submissions, setSubmissions] = useState<SubmissionSummary[] | null>(
+    () => readJson<SubmissionSummary[]>(CACHE_KEY),
+  );
+  const [finalists, setFinalists] = useState<SubmissionSummary[] | null>(
+    () => readJson<SubmissionSummary[]>(FINALISTS_KEY),
+  );
   const [view, setView] = useState<'all' | 'finalists'>('all');
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<Progress>(INITIAL);
@@ -30,6 +38,8 @@ export default function SubmissionsTab() {
       const [a, f] = await Promise.all([api.listSubmissions(), api.finalists()]);
       setSubmissions(a.submissions);
       setFinalists(f.finalists);
+      writeJson(CACHE_KEY, a.submissions);
+      writeJson(FINALISTS_KEY, f.finalists);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'failed to load');
     }
