@@ -2,8 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .form-input {
+    @apply w-full rounded-2xl bg-white px-4 py-3 text-base text-bwai-ink ring-1 ring-neutral-200 transition-colors placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-bwai-blue/40 dark:bg-neutral-900 dark:text-neutral-100 dark:ring-neutral-800 dark:placeholder:text-neutral-500;
+  }
+  .primary-cta {
+    @apply rounded-full bg-bwai-ink px-8 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-bwai-blue sm:px-10 sm:py-4 sm:text-lg dark:bg-white dark:text-bwai-ink dark:hover:bg-bwai-blue dark:hover:text-white;
+  }
+}
+
+@keyframes googleColorCycle {
+  0%, 20%   { background-color: #4285F4; } /* blue */
+  25%, 45%  { background-color: #EA4335; } /* red */
+  50%, 70%  { background-color: #FBBC04; } /* yellow */
+  75%, 95%  { background-color: #34A853; } /* green */
+  100%      { background-color: #4285F4; }
+}
+
+.color-cycle {
+  animation: googleColorCycle 24s ease-in-out infinite;
+  background-color: #4285F4;
+}
+
 :root {
   color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 html,
@@ -19,4 +45,9 @@ body {
   background: #fafafa;
   color: #1f1f1f;
   -webkit-font-smoothing: antialiased;
+}
+
+html.dark body {
+  background: #0a0a0a;
+  color: #f5f5f5;
 }
