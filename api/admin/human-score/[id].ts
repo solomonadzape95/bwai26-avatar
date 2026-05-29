@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requireAdmin } from '../../_lib/auth';
-import { getSubmission, upsertHuman } from '../../_lib/submissions';
-import { METRICS, weightedTotal } from '../../../src/lib/metrics';
-import type { HumanScores, MetricKey } from '../../../src/lib/metrics';
+import { requireAdmin } from '../../_lib/auth.js';
+import { getSubmission, upsertHuman } from '../../_lib/submissions.js';
+import { METRICS, weightedTotal } from '../../../src/lib/metrics.js';
+import type { HumanScores, MetricKey } from '../../../src/lib/metrics.js';
 
 type Body = {
   scores?: Record<string, unknown>;

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requireAdmin } from '../../_lib/auth';
-import { getSubmission, upsertAi } from '../../_lib/submissions';
-import { judgeSubmission } from '../../_lib/gemini';
+import { requireAdmin } from '../../_lib/auth.js';
+import { getSubmission, upsertAi } from '../../_lib/submissions.js';
+import { judgeSubmission } from '../../_lib/gemini.js';
 
 export const config = { maxDuration: 60 };
 

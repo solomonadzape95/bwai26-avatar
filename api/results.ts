@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getResultsPublishedAt } from './_lib/timer';
-import { listTopFive } from './_lib/submissions';
+import { getResultsPublishedAt } from './_lib/timer.js';
+import { listTopFive } from './_lib/submissions.js';
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   try {

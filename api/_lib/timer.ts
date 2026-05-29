@@ -1,5 +1,5 @@
-import { supabase } from './supabase';
-import { getDurationSeconds } from './duration';
+import { supabase } from './supabase.js';
+import { getDurationSeconds } from './duration.js';
 
 export type TimerState = {
   startedAt: number | null;

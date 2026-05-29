@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
-import { METRICS, weightedTotal } from '../../src/lib/metrics';
-import type { AiScores, MetricKey, Submission } from '../../src/lib/metrics';
-import { fetchReadme } from './github';
+import { METRICS, weightedTotal } from '../../src/lib/metrics.js';
+import type { AiScores, MetricKey, Submission } from '../../src/lib/metrics.js';
+import { fetchReadme } from './github.js';
 
 const MODEL = 'gemini-2.5-flash';
 

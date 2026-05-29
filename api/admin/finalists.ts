@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requireAdmin } from '../_lib/auth';
-import { listFinalists, summarize } from '../_lib/submissions';
+import { requireAdmin } from '../_lib/auth.js';
+import { listFinalists, summarize } from '../_lib/submissions.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requireAdmin } from './_lib/auth';
-import { createSubmission, listSubmissions, summarize } from './_lib/submissions';
-import { isTimerRunning } from './_lib/timer';
+import { requireAdmin } from './_lib/auth.js';
+import { createSubmission, listSubmissions, summarize } from './_lib/submissions.js';
+import { isTimerRunning } from './_lib/timer.js';
 
 const GITHUB_RE = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/?$/;
 

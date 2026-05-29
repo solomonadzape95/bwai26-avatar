@@ -1,11 +1,11 @@
-import { supabase } from './supabase';
+import { supabase } from './supabase.js';
 import {
   METRICS,
   type AiScores,
   type HumanScores,
   type Submission,
   type SubmissionSummary,
-} from '../../src/lib/metrics';
+} from '../../src/lib/metrics.js';
 
 type SubmissionRow = {
   id: string;
