@@ -1,0 +1,102 @@
+[
+  {
+    "round_title": "Face-Off Set 5",
+    "questions": [
+      {
+        "id": 1,
+        "type": "emoji to phrase",
+        "difficulty": "intermediate",
+        "question": "🧠📦",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Think outside the box"
+      },
+      {
+        "id": 2,
+        "type": "emoji to country",
+        "difficulty": "easy",
+        "question": "🍣🗻🌸",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Japan"
+      },
+      {
+        "id": 3,
+        "type": "name that language",
+        "difficulty": "intermediate",
+        "question": "contract Marketplace { address public owner; }",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Solidity"
+      },
+      {
+        "id": 4,
+        "type": "zoomed in logos",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "An extreme close up showing an overlapping junction of translucent yellow, orange, and red cloud-like wave curvature steps.",
+        "answer": "Cloudflare",
+        "image_url": "/games/cloudflare.png"
+      },
+      {
+        "id": 5,
+        "type": "scene to movie",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A man in chaotic clown makeup wearing a female nurse uniform walking away from a hospital building right as it violently explodes behind him.",
+        "answer": "The Dark Knight",
+        "image_url": "/games/dark-knight.png"
+      },
+      {
+        "id": 6,
+        "type": "image to tech",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "Screenshot of a developer-tools console panel.",
+        "answer": "Console",
+        "image_url": "/games/console.png"
+      },
+      {
+        "id": 7,
+        "type": "image to tech",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "Screenshot of a streaming app with rows of show thumbnails and a featured banner.",
+        "answer": "Netflix",
+        "image_url": "/games/netflix.png"
+      },
+      {
+        "id": 8,
+        "type": "name that mascot",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A cartoon penguin sitting down with yellow feet and beak.",
+        "answer": "Linux",
+        "image_url": "/games/linux.png"
+      },
+      {
+        "id": 9,
+        "type": "emoji to phrase",
+        "difficulty": "easy",
+        "question": "🌧️🐱🐶",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Raining cats and dogs"
+      },
+      {
+        "id": 10,
+        "type": "quotes",
+        "difficulty": "intermediate",
+        "question": "\"That's my secret, Captain. I'm always angry.\"",
+        "image_required": false,
+        "image_description": null,
+        "answer": "The Avengers"
+      }
+    ]
+  }
+]

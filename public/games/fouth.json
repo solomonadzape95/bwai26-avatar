@@ -1,0 +1,103 @@
+[
+  {
+    "round_title": "Face-Off Set 4",
+    "questions": [
+      {
+        "id": 1,
+        "type": "image to tech",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "Screenshot of an email inbox UI featuring a left sidebar with 'Inbox', 'Starred', 'Snoozed', and a top search bar with a filter icon.",
+        "answer": "Gmail",
+        "image_url": "/games/gmail.png"
+      },
+      {
+        "id": 2,
+        "type": "scene to movie",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "A man in a blue suit furiously asking his wife where she put his super suit while a giant robot attacks the city.",
+        "answer": "The Incredibles",
+        "image_url": "/games/incredibles.png"
+      },
+      {
+        "id": 3,
+        "type": "name that language",
+        "difficulty": "intermediate",
+        "question": "body { display: flex; justify-content: center; }",
+        "image_required": false,
+        "image_description": null,
+        "answer": "CSS"
+      },
+      {
+        "id": 4,
+        "type": "zoomed in logos",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "An extreme close up of a red teardrop-shaped location pin with a white circle inside.",
+        "answer": "Google Maps",
+        "image_url": "/games/maps.png"
+      },
+      {
+        "id": 5,
+        "type": "tech logos",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "An abstract pale-blue atom diagram with a central core sphere.",
+        "answer": "React",
+        "image_url": "/games/react.png"
+      },
+      {
+        "id": 6,
+        "type": "emoji to phrase",
+        "difficulty": "easy",
+        "question": "💵🗣️",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Money talks"
+      },
+      {
+        "id": 7,
+        "type": "name that mascot",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A green mechanical robot with antennas sticking out from a curved dome head.",
+        "answer": "Android",
+        "image_url": "/games/android.png"
+      },
+      {
+        "id": 8,
+        "type": "emoji to country",
+        "difficulty": "intermediate",
+        "question": "⚽💃🦜",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Brazil"
+      },
+      {
+        "id": 9,
+        "type": "quotes",
+        "difficulty": "easy",
+        "question": "\"There is no spoon.\"",
+        "image_required": false,
+        "image_description": null,
+        "answer": "The Matrix"
+      },
+      {
+        "id": 10,
+        "type": "scene to movie",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "An astronaut in a white spacesuit floating in a massive, infinitely repeating four-dimensional tesseract made of glowing golden threads behind a wooden bookshelf.",
+        "answer": "Interstellar",
+        "image_url": "/games/interstellar.png"
+      }
+    ]
+  }
+]

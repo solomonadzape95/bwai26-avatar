@@ -1,0 +1,102 @@
+[
+  {
+    "round_title": "Face-Off Set 1",
+    "questions": [
+      {
+        "id": 1,
+        "type": "tech logos",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "The blue capital letter 'C' with two plus signs.",
+        "answer": "C++",
+        "image_url": "/games/cpp.png"
+      },
+      {
+        "id": 2,
+        "type": "scene to movie",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A man in a black trench coat bending backward in slow motion to dodge bullets on a rooftop.",
+        "answer": "The Matrix",
+        "image_url": "/games/matrix.png"
+      },
+      {
+        "id": 3,
+        "type": "name that language",
+        "difficulty": "intermediate",
+        "question": "def greet(name):\n    print(f'Hello, {name}')",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Python"
+      },
+      {
+        "id": 4,
+        "type": "emoji to country",
+        "difficulty": "easy",
+        "question": "🗼🥖🍷",
+        "image_required": false,
+        "image_description": null,
+        "answer": "France"
+      },
+      {
+        "id": 5,
+        "type": "image to tech",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "Screenshot of a dark-themed dashboard showing an 'Authentication' tab, a 'Firestore Database' tab, and a yellow-orange abstract flame icon in the top left.",
+        "answer": "Firebase",
+        "image_url": "/games/firebase.png"
+      },
+      {
+        "id": 6,
+        "type": "name that mascot",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "Ferris, the cartoon orange/blue crab mascot.",
+        "answer": "Rust",
+        "image_url": "/games/rust.png"
+      },
+      {
+        "id": 7,
+        "type": "zoomed in logos",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "Extreme close-up of a purple and pink geometric, stylized infinity loop/rhombus corner.",
+        "answer": "Figma",
+        "image_url": "/games/figma.png"
+      },
+      {
+        "id": 8,
+        "type": "emoji to phrase",
+        "difficulty": "intermediate",
+        "question": "🐕⬆️❌🌳",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Barking up the wrong tree"
+      },
+      {
+        "id": 9,
+        "type": "emoji to movie",
+        "difficulty": "easy",
+        "question": "🕷️🕸️🦸‍♂️🏙️",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Spider-Man"
+      },
+      {
+        "id": 10,
+        "type": "quotes",
+        "difficulty": "easy",
+        "question": "\"Why so serious?\"",
+        "image_required": false,
+        "image_description": null,
+        "answer": "The Dark Knight"
+      }
+    ]
+  }
+]

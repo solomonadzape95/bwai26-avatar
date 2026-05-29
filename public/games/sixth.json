@@ -1,0 +1,101 @@
+[
+  {
+    "round_title": "Face-Off Set 6",
+    "questions": [
+      {
+        "id": 1,
+        "type": "zoomed in logos",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "A stylized bun with a small face on top, used as the Bun JavaScript runtime logo.",
+        "answer": "Bun",
+        "image_url": "/games/bun.svg"
+      },
+      {
+        "id": 2,
+        "type": "name that mascot",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "A stylized fox curled around a blue and purple Earth globe.",
+        "answer": "Firefox",
+        "image_url": "/games/firefox.svg"
+      },
+      {
+        "id": 3,
+        "type": "emoji to phrase",
+        "difficulty": "intermediate",
+        "question": "🐍🛢️",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Snake oil"
+      },
+      {
+        "id": 4,
+        "type": "emoji to country",
+        "difficulty": "intermediate",
+        "question": "🐘🥭🌶️",
+        "image_required": false,
+        "image_description": null,
+        "answer": "India"
+      },
+      {
+        "id": 5,
+        "type": "name that language",
+        "difficulty": "intermediate",
+        "question": "5.times { |i| puts \"Round #{i}\" }",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Ruby"
+      },
+      {
+        "id": 6,
+        "type": "tech logos",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "A blue seven-spoked ship's-wheel logo with a hexagonal outer border.",
+        "answer": "Kubernetes",
+        "image_url": "/games/kubernetes.svg"
+      },
+      {
+        "id": 7,
+        "type": "emoji to phrase",
+        "difficulty": "easy",
+        "question": "💔🧊",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Break the ice"
+      },
+      {
+        "id": 8,
+        "type": "quotes",
+        "difficulty": "intermediate",
+        "question": "\"Houston, we have a problem.\"",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Apollo 13"
+      },
+      {
+        "id": 9,
+        "type": "name that mascot",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "A simple white ghost silhouette on a bright yellow background.",
+        "answer": "Snapchat",
+        "image_url": "/games/snapchat.svg"
+      },
+      {
+        "id": 10,
+        "type": "icon to tech",
+        "difficulty": "intermediate",
+        "question": "SiPrisma",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Prisma"
+      }
+    ]
+  }
+]

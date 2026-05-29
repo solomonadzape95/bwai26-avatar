@@ -1,0 +1,103 @@
+[
+  {
+    "round_title": "Face-Off Set 3",
+    "questions": [
+      {
+        "id": 1,
+        "type": "name that language",
+        "difficulty": "easy",
+        "question": "fmt.Println(\"Hello, World\")",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Go"
+      },
+      {
+        "id": 2,
+        "type": "emoji to country",
+        "difficulty": "easy",
+        "question": "🦘🐨🪵",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Australia"
+      },
+      {
+        "id": 3,
+        "type": "tech logos",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A circular logo with a blue center surrounded by red, yellow, and green sections.",
+        "answer": "Google Chrome",
+        "image_url": "/games/chrome.png"
+      },
+      {
+        "id": 4,
+        "type": "zoomed in logos",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "An extreme close up of a stylized black and white letter 'N' formed by a single continuous geometric folded line.",
+        "answer": "Next.js",
+        "image_url": "/games/next.png"
+      },
+      {
+        "id": 5,
+        "type": "image to tech",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "Screenshot of a black-and-white minimalist UI dashboard showing a list of projects, deployment statuses, and domain configurations.",
+        "answer": "Vercel",
+        "image_url": "/games/vercel.png"
+      },
+      {
+        "id": 6,
+        "type": "scene to movie",
+        "difficulty": "intermediate",
+        "question": "",
+        "image_required": true,
+        "image_description": "A spinning silver metal top on a wooden table.",
+        "answer": "Inception",
+        "image_url": "/games/inception.png"
+      },
+      {
+        "id": 7,
+        "type": "name that mascot",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A black cat silhouette with tentacle arms sitting inside a circle.",
+        "answer": "GitHub",
+        "image_url": "/games/github.png"
+      },
+      {
+        "id": 8,
+        "type": "tech logos",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A stylized flat vector art of a blue whale carrying gray cargo boxes.",
+        "answer": "Docker",
+        "image_url": "/games/docker.png"
+      },
+      {
+        "id": 9,
+        "type": "emoji to phrase",
+        "difficulty": "easy",
+        "question": "⏳💸",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Time is money"
+      },
+      {
+        "id": 10,
+        "type": "quotes",
+        "difficulty": "intermediate",
+        "question": "\"The 'D' is silent.\"",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Django Unchained"
+      }
+    ]
+  }
+]

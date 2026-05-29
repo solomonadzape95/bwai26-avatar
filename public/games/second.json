@@ -1,0 +1,103 @@
+[
+  {
+    "round_title": "Face-Off Set 2",
+    "questions": [
+      {
+        "id": 1,
+        "type": "emoji to phrase",
+        "difficulty": "easy",
+        "question": "🍎👁️",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Apple of my eye"
+      },
+      {
+        "id": 2,
+        "type": "zoomed in logos",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "Extreme close-up of the glowing white half-bitten apple leaf segment.",
+        "answer": "Apple",
+        "image_url": "/games/apple.png"
+      },
+      {
+        "id": 3,
+        "type": "image to tech",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "Screenshot of the default dark theme user interface showing a file explorer sidebar on the left and a code editor pane on the right with a minimap.",
+        "answer": "Visual Studio Code (VS Code)",
+        "image_url": "/games/vscode.png"
+      },
+      {
+        "id": 4,
+        "type": "name that language",
+        "difficulty": "intermediate",
+        "question": "console.log(typeof NaN);",
+        "image_required": false,
+        "image_description": null,
+        "answer": "JavaScript"
+      },
+      {
+        "id": 5,
+        "type": "scene to movie",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A young boy slaps his hands with aftershave and screams in front of a bathroom mirror.",
+        "answer": "Home Alone",
+        "image_url": "/games/home-alone.png"
+      },
+      {
+        "id": 6,
+        "type": "tech logos",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "The minimalist profile silhouette of a blue elephant.",
+        "answer": "PostgreSQL",
+        "image_url": "/games/postgres.png"
+      },
+      {
+        "id": 7,
+        "type": "emoji to country",
+        "difficulty": "intermediate",
+        "question": "🍁🥞❄️",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Canada"
+      },
+      {
+        "id": 8,
+        "type": "name that mascot",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A green stylized leaf logo character.",
+        "answer": "MongoDB",
+        "image_url": "/games/mongo.png"
+      },
+      {
+        "id": 9,
+        "type": "scene to movie",
+        "difficulty": "easy",
+        "question": "",
+        "image_required": true,
+        "image_description": "A 360-degree panning shot of six superheroes standing in a circle back-to-back in the middle of a destroyed New York City street.",
+        "answer": "Avengers: Age of Ultron",
+        "image_url": "/games/avengers.png"
+      },
+      {
+        "id": 10,
+        "type": "quotes",
+        "difficulty": "intermediate",
+        "question": "\"Mankind was born on Earth. It was never meant to die here.\"",
+        "image_required": false,
+        "image_description": null,
+        "answer": "Interstellar"
+      }
+    ]
+  }
+]
