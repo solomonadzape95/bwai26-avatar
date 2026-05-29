@@ -63,6 +63,14 @@ export const RESOURCES: Resource[] = [
     tier: 'recommended',
   },
   {
+    name: 'Stitch',
+    tagline: 'Generate UI designs from a prompt',
+    description:
+      'Google Labs’ AI design tool. Describe a screen in natural language and get editable mocks plus the code to ship them. Great for nailing the look before you wire anything up.',
+    url: 'https://stitch.withgoogle.com/',
+    tier: 'recommended',
+  },
+  {
     name: 'Gemini for Developers (docs)',
     tagline: 'Cookbooks, quickstarts, and SDK refs',
     description:
